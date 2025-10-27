@@ -61,6 +61,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             overtime = body_data.get('overtime', False)
             shootout = body_data.get('shootout', False)
             
+            cur.execute('SELECT home_team_id, away_team_id FROM matches WHERE id = %s', (match_id,))
+            match = cur.fetchone()
+            home_team_id = match['home_team_id']
+            away_team_id = match['away_team_id']
+            
             cur.execute('''
                 UPDATE matches 
                 SET home_score = %s, away_score = %s, status = 'finished',
@@ -68,6 +73,58 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 WHERE id = %s
                 RETURNING id
             ''', (home_score, away_score, overtime, shootout, match_id))
+            
+            home_win = home_score > away_score
+            
+            if home_win:
+                winner_id = home_team_id
+                loser_id = away_team_id
+            else:
+                winner_id = away_team_id
+                loser_id = home_team_id
+            
+            if overtime or shootout:
+                cur.execute('''
+                    UPDATE team_stats 
+                    SET games_played = games_played + 1,
+                        wins_ot = wins_ot + CASE WHEN %s THEN 1 ELSE 0 END,
+                        wins_so = wins_so + CASE WHEN %s THEN 1 ELSE 0 END,
+                        goals_for = goals_for + %s,
+                        goals_against = goals_against + %s,
+                        points = points + 2
+                    WHERE team_id = %s
+                ''', (overtime, shootout, home_score if home_win else away_score, away_score if home_win else home_score, winner_id))
+                
+                cur.execute('''
+                    UPDATE team_stats 
+                    SET games_played = games_played + 1,
+                        losses_ot = losses_ot + CASE WHEN %s THEN 1 ELSE 0 END,
+                        losses_so = losses_so + CASE WHEN %s THEN 1 ELSE 0 END,
+                        goals_for = goals_for + %s,
+                        goals_against = goals_against + %s,
+                        points = points + 1
+                    WHERE team_id = %s
+                ''', (overtime, shootout, away_score if home_win else home_score, home_score if home_win else away_score, loser_id))
+            else:
+                cur.execute('''
+                    UPDATE team_stats 
+                    SET games_played = games_played + 1,
+                        wins = wins + 1,
+                        goals_for = goals_for + %s,
+                        goals_against = goals_against + %s,
+                        points = points + 2
+                    WHERE team_id = %s
+                ''', (home_score if home_win else away_score, away_score if home_win else home_score, winner_id))
+                
+                cur.execute('''
+                    UPDATE team_stats 
+                    SET games_played = games_played + 1,
+                        losses = losses + 1,
+                        goals_for = goals_for + %s,
+                        goals_against = goals_against + %s,
+                        points = points + 0
+                    WHERE team_id = %s
+                ''', (away_score if home_win else home_score, home_score if home_win else away_score, loser_id))
             
             conn.commit()
             
@@ -192,6 +249,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Access-Control-Allow-Origin': '*'
                 },
                 'body': json.dumps({'success': True, 'message': 'Champion added'}),
+                'isBase64Encoded': False
+            }
+        
+        elif action == 'update_setting':
+            setting_key = body_data['setting_key']
+            setting_value = body_data['setting_value']
+            
+            cur.execute('''
+                UPDATE league_settings 
+                SET setting_value = %s, updated_at = CURRENT_TIMESTAMP
+                WHERE setting_key = %s
+                RETURNING id
+            ''', (setting_value, setting_key))
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True, 'message': 'Setting updated'}),
                 'isBase64Encoded': False
             }
         

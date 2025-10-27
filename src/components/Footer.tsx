@@ -40,32 +40,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Социальные сети</h4>
-            <div className="flex gap-3">
-              <a
-                href="https://twitch.tv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-muted hover:bg-primary rounded-lg flex items-center justify-center transition-all hover:scale-110"
-              >
-                <Icon name="Twitch" size={20} />
-              </a>
-              <a
-                href="https://discord.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-muted hover:bg-secondary rounded-lg flex items-center justify-center transition-all hover:scale-110"
-              >
-                <Icon name="MessageCircle" size={20} />
-              </a>
-              <a
-                href="https://t.me"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-muted hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110"
-              >
-                <Icon name="Send" size={20} />
-              </a>
+            <h4 className="font-semibold mb-4">Информация</h4>
+            <div className="flex flex-col gap-2">
+              <Link to="/regulations" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Регламент лиги
+              </Link>
             </div>
           </div>
         </div>

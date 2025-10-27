@@ -3,21 +3,14 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { fetchMatches, fetchTeams, calculateStandings } from '@/lib/api';
+import { fetchStandings } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 
 export default function Standings() {
-  const { data: teams = [] } = useQuery({
-    queryKey: ['teams'],
-    queryFn: fetchTeams,
+  const { data: standings = [] } = useQuery({
+    queryKey: ['standings'],
+    queryFn: fetchStandings,
   });
-
-  const { data: matches = [] } = useQuery({
-    queryKey: ['matches'],
-    queryFn: fetchMatches,
-  });
-
-  const standings = calculateStandings(teams, matches);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -108,7 +101,7 @@ export default function Standings() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">3</span>
+                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">2</span>
                       <span>Победа в основное время</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -116,7 +109,7 @@ export default function Standings() {
                       <span>Поражение в овертайме</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">3</span>
+                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">2</span>
                       <span>Победа в овертайме</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -124,7 +117,7 @@ export default function Standings() {
                       <span>Поражение по буллитам</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">3</span>
+                      <span className="w-8 h-8 bg-green-500/20 text-green-500 rounded flex items-center justify-center font-bold">2</span>
                       <span>Победа по буллитам</span>
                     </div>
                     <div className="flex items-center gap-2">

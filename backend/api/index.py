@@ -144,6 +144,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        elif endpoint == 'standings':
+            cur.execute('''
+                SELECT 
+                    ts.*,
+                    t.id as team_id, t.name as team_name, t.logo as team_logo,
+                    t.city as team_city, t.founded as team_founded, t.arena as team_arena
+                FROM team_stats ts
+                JOIN teams t ON ts.team_id = t.id
+                ORDER BY ts.points DESC, (ts.goals_for - ts.goals_against) DESC, ts.goals_for DESC
+            ''')
+            rows = cur.fetchall()
+            
+            standings = []
+            for row in rows:
+                standings.append({
+                    'team': {
+                        'id': row['team_id'],
+                        'name': row['team_name'],
+                        'logo': row['team_logo'],
+                        'city': row['team_city'],
+                        'founded': row['team_founded'],
+                        'arena': row['team_arena']
+                    },
+                    'games': row['games_played'],
+                    'wins': row['wins'],
+                    'losses': row['losses'],
+                    'overtimeLosses': row['losses_ot'],
+                    'shootoutLosses': row['losses_so'],
+                    'goalsFor': row['goals_for'],
+                    'goalsAgainst': row['goals_against'],
+                    'points': row['points']
+                })
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'standings': standings}),
+                'isBase64Encoded': False
+            }
+        
         else:
             return {
                 'statusCode': 400,

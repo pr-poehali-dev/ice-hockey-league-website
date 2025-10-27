@@ -13,9 +13,7 @@ const navItems = [
   { path: '/standings', label: 'Таблица' },
   { path: '/champions', label: 'Чемпионы' },
   { path: '/teams', label: 'Команды' },
-  { path: '/about', label: 'О лиге' },
   { path: '/regulations', label: 'Регламент' },
-  { path: '/contacts', label: 'Контакты' },
 ];
 
 export default function Header() {

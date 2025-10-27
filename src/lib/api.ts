@@ -58,71 +58,8 @@ export const fetchChampions = async (): Promise<Champion[]> => {
   return data.champions;
 };
 
-export const calculateStandings = (teams: Team[], matches: Match[]): Standing[] => {
-  const standingsMap = new Map<number, Standing>();
-
-  teams.forEach(team => {
-    standingsMap.set(team.id, {
-      team,
-      games: 0,
-      wins: 0,
-      losses: 0,
-      overtimeLosses: 0,
-      shootoutLosses: 0,
-      goalsFor: 0,
-      goalsAgainst: 0,
-      points: 0,
-    });
-  });
-
-  matches
-    .filter(match => match.status === 'finished' && match.homeScore !== undefined && match.awayScore !== undefined)
-    .forEach(match => {
-      const homeStanding = standingsMap.get(match.homeTeam.id)!;
-      const awayStanding = standingsMap.get(match.awayTeam.id)!;
-
-      homeStanding.games += 1;
-      awayStanding.games += 1;
-
-      homeStanding.goalsFor += match.homeScore!;
-      homeStanding.goalsAgainst += match.awayScore!;
-      awayStanding.goalsFor += match.awayScore!;
-      awayStanding.goalsAgainst += match.homeScore!;
-
-      if (match.homeScore! > match.awayScore!) {
-        homeStanding.wins += 1;
-        homeStanding.points += 3;
-
-        if (match.overtime) {
-          awayStanding.overtimeLosses += 1;
-          awayStanding.points += 1;
-        } else if (match.shootout) {
-          awayStanding.shootoutLosses += 1;
-          awayStanding.points += 1;
-        } else {
-          awayStanding.losses += 1;
-        }
-      } else {
-        awayStanding.wins += 1;
-        awayStanding.points += 3;
-
-        if (match.overtime) {
-          homeStanding.overtimeLosses += 1;
-          homeStanding.points += 1;
-        } else if (match.shootout) {
-          homeStanding.shootoutLosses += 1;
-          homeStanding.points += 1;
-        } else {
-          homeStanding.losses += 1;
-        }
-      }
-    });
-
-  return Array.from(standingsMap.values()).sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    const aDiff = a.goalsFor - a.goalsAgainst;
-    const bDiff = b.goalsFor - b.goalsAgainst;
-    if (bDiff !== aDiff) return bDiff - aDiff;
-    return b.goalsFor - a.goalsFor;
-  });
+export const fetchStandings = async (): Promise<Standing[]> => {
+  const response = await fetch(`${API_URL}?endpoint=standings`);
+  const data = await response.json();
+  return data.standings;
 };

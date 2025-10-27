@@ -9,9 +9,7 @@ import Calendar from "./pages/Calendar";
 import Standings from "./pages/Standings";
 import Champions from "./pages/Champions";
 import Teams from "./pages/Teams";
-import About from "./pages/About";
 import Regulations from "./pages/Regulations";
-import Contacts from "./pages/Contacts";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -29,9 +27,7 @@ const App = () => (
           <Route path="/standings" element={<Standings />} />
           <Route path="/champions" element={<Champions />} />
           <Route path="/teams" element={<Teams />} />
-          <Route path="/about" element={<About />} />
           <Route path="/regulations" element={<Regulations />} />
-          <Route path="/contacts" element={<Contacts />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
