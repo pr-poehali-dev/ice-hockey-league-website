@@ -11,6 +11,7 @@ import Champions from "./pages/Champions";
 import Teams from "./pages/Teams";
 import About from "./pages/About";
 import Contacts from "./pages/Contacts";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/teams" element={<Teams />} />
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

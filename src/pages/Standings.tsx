@@ -1,12 +1,23 @@
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { calculateStandings } from '@/data/mockData';
+import { fetchMatches, fetchTeams, calculateStandings } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 
 export default function Standings() {
-  const standings = calculateStandings();
+  const { data: teams = [] } = useQuery({
+    queryKey: ['teams'],
+    queryFn: fetchTeams,
+  });
+
+  const { data: matches = [] } = useQuery({
+    queryKey: ['matches'],
+    queryFn: fetchMatches,
+  });
+
+  const standings = calculateStandings(teams, matches);
 
   return (
     <div className="min-h-screen flex flex-col">

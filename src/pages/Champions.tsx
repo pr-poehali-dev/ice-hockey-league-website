@@ -1,10 +1,15 @@
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
-import { champions } from '@/data/mockData';
+import { fetchChampions } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 
 export default function Champions() {
+  const { data: champions = [] } = useQuery({
+    queryKey: ['champions'],
+    queryFn: fetchChampions,
+  });
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

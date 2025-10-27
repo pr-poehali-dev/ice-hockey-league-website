@@ -1,10 +1,15 @@
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
-import { teams } from '@/data/mockData';
+import { fetchTeams } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 
 export default function Teams() {
+  const { data: teams = [] } = useQuery({
+    queryKey: ['teams'],
+    queryFn: fetchTeams,
+  });
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

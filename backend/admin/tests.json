@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Unauthorized access",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "update_match_result",
+        "match_id": 1,
+        "home_score": 5,
+        "away_score": 3
+      },
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

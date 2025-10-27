@@ -1,11 +1,17 @@
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { matches } from '@/data/mockData';
+import { fetchMatches } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 
 export default function Calendar() {
+  const { data: matches = [] } = useQuery({
+    queryKey: ['matches'],
+    queryFn: fetchMatches,
+  });
+
   const upcomingMatches = matches.filter(m => m.status === 'upcoming');
   const finishedMatches = matches.filter(m => m.status === 'finished');
 

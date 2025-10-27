@@ -1,12 +1,23 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { matches, teams } from '@/data/mockData';
+import { fetchMatches, fetchTeams } from '@/lib/api';
 
 export default function Home() {
+  const { data: matches = [] } = useQuery({
+    queryKey: ['matches'],
+    queryFn: fetchMatches,
+  });
+
+  const { data: teams = [] } = useQuery({
+    queryKey: ['teams'],
+    queryFn: fetchTeams,
+  });
+
   const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 3);
   const recentMatches = matches.filter(m => m.status === 'finished').slice(0, 3);
 
