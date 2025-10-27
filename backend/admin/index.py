@@ -1,5 +1,5 @@
 '''
-Business: Админ API для управления матчами PHL (добавление, обновление результатов)
+Business: Админ API для управления всеми данными PHL (команды, матчи, чемпионы)
 Args: event - dict с httpMethod, body
       context - объект с request_id
 Returns: HTTP response с результатом операции
@@ -11,7 +11,7 @@ from typing import Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-ADMIN_KEY = 'phl_admin_2024'
+ADMIN_KEY = 'phldyeztop'
 
 def get_db_connection():
     dsn = os.environ.get('DATABASE_URL')
@@ -25,7 +25,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, PUT, OPTIONS',
+                'Access-Control-Allow-Methods': 'POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
                 'Access-Control-Max-Age': '86400'
             },
@@ -103,6 +103,95 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Access-Control-Allow-Origin': '*'
                 },
                 'body': json.dumps({'success': True, 'match_id': result['id']}),
+                'isBase64Encoded': False
+            }
+        
+        elif action == 'delete_match':
+            match_id = body_data['match_id']
+            
+            cur.execute('UPDATE matches SET status = %s WHERE id = %s', ('cancelled', match_id))
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True, 'message': 'Match cancelled'}),
+                'isBase64Encoded': False
+            }
+        
+        elif action == 'update_team':
+            team_id = body_data['team_id']
+            name = body_data.get('name')
+            logo = body_data.get('logo')
+            city = body_data.get('city')
+            arena = body_data.get('arena')
+            division = body_data.get('division')
+            
+            updates = []
+            params = []
+            
+            if name: 
+                updates.append('name = %s')
+                params.append(name)
+            if logo: 
+                updates.append('logo = %s')
+                params.append(logo)
+            if city: 
+                updates.append('city = %s')
+                params.append(city)
+            if arena: 
+                updates.append('arena = %s')
+                params.append(arena)
+            if division: 
+                updates.append('division = %s')
+                params.append(division)
+            
+            params.append(team_id)
+            
+            cur.execute(f'''
+                UPDATE teams 
+                SET {', '.join(updates)}
+                WHERE id = %s
+                RETURNING id
+            ''', params)
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True, 'message': 'Team updated'}),
+                'isBase64Encoded': False
+            }
+        
+        elif action == 'add_champion':
+            year = body_data['year']
+            team_id = body_data['team_id']
+            finals = body_data['finals']
+            
+            cur.execute('''
+                INSERT INTO champions (year, team_id, finals)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (year) DO UPDATE 
+                SET team_id = EXCLUDED.team_id, finals = EXCLUDED.finals
+                RETURNING id
+            ''', (year, team_id, finals))
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True, 'message': 'Champion added'}),
                 'isBase64Encoded': False
             }
         

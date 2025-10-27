@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const navItems = [
   { path: '/', label: 'Главная' },
@@ -11,12 +14,16 @@ const navItems = [
   { path: '/champions', label: 'Чемпионы' },
   { path: '/teams', label: 'Команды' },
   { path: '/about', label: 'О лиге' },
+  { path: '/regulations', label: 'Регламент' },
   { path: '/contacts', label: 'Контакты' },
 ];
 
 export default function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [adminDialogOpen, setAdminDialogOpen] = useState(false);
+  const [password, setPassword] = useState('');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -48,6 +55,50 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            
+            <Dialog open={adminDialogOpen} onOpenChange={setAdminDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="ml-2">
+                  <Icon name="KeyRound" size={20} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Вход в админ-панель</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="password">Пароль</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Введите пароль"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && password === 'phldyeztop') {
+                          navigate('/admin');
+                          setAdminDialogOpen(false);
+                          setPassword('');
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      if (password === 'phldyeztop') {
+                        navigate('/admin');
+                        setAdminDialogOpen(false);
+                        setPassword('');
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    Войти
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </nav>
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -72,6 +123,51 @@ export default function Header() {
                     {item.label}
                   </Link>
                 ))}
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      <Icon name="KeyRound" size={18} className="mr-2" />
+                      Админ-панель
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Вход в админ-панель</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="password-mobile">Пароль</Label>
+                        <Input
+                          id="password-mobile"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Введите пароль"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && password === 'phldyeztop') {
+                              navigate('/admin');
+                              setOpen(false);
+                              setPassword('');
+                            }
+                          }}
+                        />
+                      </div>
+                      <Button
+                        onClick={() => {
+                          if (password === 'phldyeztop') {
+                            navigate('/admin');
+                            setOpen(false);
+                            setPassword('');
+                          }
+                        }}
+                        className="w-full"
+                      >
+                        Войти
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </SheetContent>
           </Sheet>
